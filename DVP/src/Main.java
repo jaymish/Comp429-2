@@ -160,8 +160,21 @@ public class Main {
 				int linkServer1 = Integer.parseInt(splitLine[1]);
 				int linkServer2 = Integer.parseInt(splitLine[2]);
 				String newCostOfLink =  splitLine[3];
-				sendUpdateLinkCostToNeighbor(linkServer1,linkServer2,newCostOfLink);
-				break;
+				if(linkServer1 == linkServer2)
+				{
+					System.out.println("Enter command correctly");
+					break;
+				}
+				else if(linkServer2 == myServerId)
+				{
+					sendUpdateLinkCostToNeighbor(linkServer2,linkServer1,newCostOfLink);
+					break;
+				}
+				else
+				{
+					sendUpdateLinkCostToNeighbor(linkServer1,linkServer2,newCostOfLink);
+					break;
+				}
 			case "step":
 				doStep(allServers);
 				//sendRoutingTableToNeighbor("step","192.168.0.44", 6666);
@@ -177,6 +190,10 @@ public class Main {
 				break;
 			case "disable":
 				//send this to all servers, not just neighbors
+				if(splitLine[1].equals(myServerId))
+				{
+					break;
+				}
 				sendDisableToAllServers(Integer.parseInt(splitLine[1]));
 				countOfDisabledServers++;
 				break;
