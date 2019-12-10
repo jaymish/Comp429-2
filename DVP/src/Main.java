@@ -118,8 +118,8 @@ public class Main {
 					System.out.println("Server Command Incorrect");
 					continue;
 				}
-				//allServers = readTopologyFile(splitLine[2], allServers);
-				allServers = readTopologyFile("/home/krishna/workspaces/eclipse/DVP/src/topology.txt", allServers);
+				allServers = readTopologyFile(splitLine[2], allServers);
+				//allServers = readTopologyFile("/home/krishna/workspaces/eclipse/DVP/src/topology.txt", allServers);
 
 				allServers = createRoutingTable(allServers);
 
