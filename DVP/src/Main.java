@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -89,7 +91,7 @@ public class Main {
 
 	static ArrayList<ServerDetails> allServers =new ArrayList<>();
 	static int[][] routingTableReadFromTopologyFile;
-	static int updateInterval=1000,myServerId=2,countOfDisabledServers=0;
+	static int updateInterval=1000,myServerId=1,countOfDisabledServers=0;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -122,6 +124,12 @@ public class Main {
 				//allServers = readTopologyFile("/home/krishna/workspaces/eclipse/DVP/src/topology.txt", allServers);
 
 				allServers = createRoutingTable(allServers);
+				
+				//Main mainObj = new Main();
+				
+				//Timer time = new Timer(); // Instantiate Timer Object
+        		//ScheduledTask st = mainObj.new ScheduledTask(); // Instantiate SheduledTask class
+        		//time.schedule(st,60000, updateInterval); // Create Repetitively task for every 1 secs
 
 				routingTableReadFromTopologyFile = new int[allServers.size()+countOfDisabledServers][allServers.size()+countOfDisabledServers];
 				for(int i=0;i<allServers.size();i++) {
@@ -190,8 +198,9 @@ public class Main {
 				break;
 			case "disable":
 				//send this to all servers, not just neighbors
-				if(splitLine[1].equals(myServerId))
+				if(Integer.parseInt(splitLine[1])==(myServerId))
 				{
+					System.out.println("Can not Disable yourself");
 					break;
 				}
 				sendDisableToAllServers(Integer.parseInt(splitLine[1]));
@@ -387,6 +396,7 @@ public class Main {
 		JSONObject obj=new JSONObject();
 		try {
 			obj.put("operation", "step");
+			obj.put("id_of_sender", myServerId);
 			for(int i=0;i<allServers.size();i++) {
 				//System.out.println("server id ="+allServers.get(i).id);
 				if(allServers.get(i).id == myServerId) {
@@ -432,9 +442,9 @@ public class Main {
 	}
 
 	private static void displayRoutingTable(ArrayList<ServerDetails> allServers) {
-
+		System.out.println("Routing Table is");
 		for (int i = 0; i < allServers.size(); i++) {
-			System.out.println("Routing Table is");
+			
 			if (allServers.get(i).id == myServerId) {
 				for (int j = 0; j < allServers.get(i).routingTable.length; j++) {
 					for (int k = 0; k < allServers.get(i).routingTable[j].length; k++) {
@@ -782,7 +792,7 @@ public class Main {
 			doStep(allServers);
 
 		}
-		allServers.get(i).noOfPacketsReceived++;
+		//allServers.get(i).noOfPacketsReceived++;
 		// displayRoutingTable(allServers);
 		return allServers;
 	}
@@ -817,6 +827,7 @@ public class Main {
 					//JSONObject receivedJSON =  line.;
 					switch(receivedJSON.get("operation").toString()) {
 					case "step":
+						System.out.println("Received a Message From Server "+receivedJSON.getInt("id_of_sender"));
 
 						int[][] nrt =new int[allServers.size()+countOfDisabledServers][allServers.size()+countOfDisabledServers];
 						//System.out.println("inside step");
@@ -925,6 +936,17 @@ public class Main {
 				//System.out.println("inside outer catch");
 				System.out.println(i);
 			}
+		}
+	}
+	class ScheduledTask extends TimerTask {
+
+		//Date now; // to display current time
+
+		// Add your task here
+		public void run() {
+			//now = new Date(); // initialize date
+			//System.out.println("Time is :" + now); // Display current time
+			doStep(allServers);
 		}
 	}
 }
